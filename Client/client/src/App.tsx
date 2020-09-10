@@ -1,34 +1,56 @@
-import React, { useState } from "react";
-import signalR from "@microsoft/signalr";
-import logo from "./logo.svg";
+import React, { Component } from "react";
+import * as signalR from "@microsoft/signalr";
 import "./App.css";
 
-function App() {
-	const hubConnection = new signalR.HubConnectionBuilder()
-		.withUrl("/chat")
-		.build();
+interface IState {
+	message: string,
+	messageHistory: string[],
+	hubConnection?: signalR.HubConnection
+}
 
-	hubConnection.on("Send", function (data) {
-		let elem = document.createElement("p");
-		elem.appendChild(document.createTextNode(data));
-		let firstElem = document.getElementById("chatroom").firstChild;
-		document.getElementById("chatroom").insertBefore(elem, firstElem);
-	});
-	document.getElementById("sendBtn").addEventListener("click", function (e) {
-		let message = document.getElementById("message").value;
-		hubConnection.invoke("Send", message);
-	});
+class App extends Component<{}, IState> {
+	constructor(props: any) {
+		super(props);
+		this.state = {
+			message: "",
+			messageHistory: [],
+			hubConnection: undefined
+		}
+	}
 
-	hubConnection.start();
-	return (
+	componentDidMount() {
+		let hubConnection = new signalR.HubConnectionBuilder()
+			.withUrl("http://localhost:5000/chat")
+			.build();
+		this.setState({hubConnection: hubConnection});
+		hubConnection.on("Send", (data: string) => {
+			let messageArray = this.state.messageHistory;
+			messageArray.push(data);
+			this.setState({messageHistory: messageArray});
+		});
+		hubConnection.start().catch((err) => console.log(err));
+	}
+
+	render() {
+		return (
 		<div className="App">
 			<div id="inputForm">
-				<input type="text" id="message" />
-				<input type="button" id="sendBtn" value="Отправить" />
+				<input type="text" id="message" onChange={(e) => this.setState({message: e.target.value})}/>
+				<input type="button" id="sendBtn" value="Отправить" onClick={() => this.state.hubConnection && this.state.hubConnection.invoke("Send", this.state.message)}/>
 			</div>
-			<div id="chatroom"></div>
+			<div>
+				{
+					this.state.messageHistory
+						.map(
+							(m: string) => {
+								return <div>{m}</div>
+							}
+						)
+				}
+			</div>
 		</div>
-	);
+		)
+	}
 }
 
 export default App;

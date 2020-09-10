@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TicTacToe.Hubs;
+using TicTacToe.Games;
 
 namespace TicTacToe
 {
@@ -25,6 +26,7 @@ namespace TicTacToe
 					.WithOrigins("http://localhost:3000")
 					.AllowCredentials();
 			}));
+			services.AddSingleton<IGame>(new Game());
 			services.AddSignalR();
         }
 
@@ -42,7 +44,7 @@ namespace TicTacToe
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapHub<GameHub>("/game");
             });
         }
     }

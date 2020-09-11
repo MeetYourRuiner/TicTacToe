@@ -9,18 +9,23 @@ using Microsoft.Extensions.Logging;
 
 namespace TicTacToe
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			CreateHostBuilder(args).Build().Run();
+		}
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+		public static IHostBuilder CreateHostBuilder(string[] args) =>
+			Host.CreateDefaultBuilder(args)
+				.ConfigureWebHostDefaults(webBuilder =>
+				{
+					webBuilder.UseStartup<Startup>();
+				})
+				.ConfigureLogging(logging =>
+				{
+					logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+					logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
+				});
     }
 }

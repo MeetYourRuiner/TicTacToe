@@ -1,5 +1,6 @@
 import * as signalR from "@microsoft/signalr";
 import React from "react";
+import "./TicTacToe.css";
 
 interface IState {
 	hubConnection?: signalR.HubConnection;
@@ -23,7 +24,7 @@ class TicTacToe extends React.Component<{}, IState> {
 			isMyTurn: false,
 			status: "Game is not started",
 			hubConnection: undefined,
-			board: [],
+			board: new Array<string>().fill(' '),
 		};
 	}
 
@@ -99,23 +100,30 @@ class TicTacToe extends React.Component<{}, IState> {
 		const tableStyle = {
 			border: "1px solid black",
 		};
+		const renderCell = (index: number) =>
+		{
+			return (
+				<td onClick={() => this.handleClick(index)}>{this.state.board[index]}</td>
+			)
+		}
+
 		return (
 			<table style={tableStyle} className="board">
 				<tbody>
 					<tr>
-						<td onClick={() => this.handleClick(0)}>{this.state.board[0]}</td>
-						<td onClick={() => this.handleClick(1)}>{this.state.board[1]}</td>
-						<td onClick={() => this.handleClick(2)}>{this.state.board[2]}</td>
+						{renderCell(0)}						
+						{renderCell(1)}
+						{renderCell(2)}
 					</tr>
 					<tr>
-						<td onClick={() => this.handleClick(3)}>{this.state.board[3]}</td>
-						<td onClick={() => this.handleClick(4)}>{this.state.board[4]}</td>
-						<td onClick={() => this.handleClick(5)}>{this.state.board[5]}</td>
+						{renderCell(3)}
+						{renderCell(4)}
+						{renderCell(5)}
 					</tr>
 					<tr>
-						<td onClick={() => this.handleClick(6)}>{this.state.board[6]}</td>
-						<td onClick={() => this.handleClick(7)}>{this.state.board[7]}</td>
-						<td onClick={() => this.handleClick(8)}>{this.state.board[8]}</td>
+						{renderCell(6)}
+						{renderCell(7)}
+						{renderCell(8)}						
 					</tr>
 				</tbody>
 			</table>
@@ -124,7 +132,7 @@ class TicTacToe extends React.Component<{}, IState> {
 
 	render() {
 		return (
-			<div>
+			<div className="game">
 				<div className="status">{this.state.status}</div>
 				{this.renderBoard()}
 			</div>

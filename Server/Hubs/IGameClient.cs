@@ -4,7 +4,7 @@ namespace TicTacToe.Hubs
 {
 	public interface IGameClient
 	{
-		Task UpdateBoard(char[][] board);
+		Task UpdateBoard(char[,] board);
 		Task Turn(char role);
 		Task Victory(string id);
 		Task Tie();

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using System;
-using TicTacToe.Games;
+using TicTacToe.GameLogic;
 
 namespace TicTacToe.Hubs
 {
@@ -12,22 +12,25 @@ namespace TicTacToe.Hubs
 		{
 			_game = game;
 		}
-		public async Task Action(byte i, char role)
+		public async Task Action(byte cellIndex, char mark)
 		{
-			_game.UpdateBoard(i, role);
+			_game.UpdateCell(cellIndex, mark);
 			await this.Clients.All.UpdateBoard(_game.Board);
 			if (_game.CheckTie())
 			{
 				await this.Clients.All.Tie();
+				await this.Clients.All.Stop();
 			}
 			else if (_game.CheckWinner())
 			{
 				await this.Clients.All.Victory(_game.GetWinner());
+				await this.Clients.All.Stop();
 			}
 			else
 			{
-				var nextTurn = role == 'x' ? 'o' : 'x';
-				await this.Clients.All.Turn(nextTurn);
+				_game.NextTurn();
+				var nextActivePlayer = _game.ActivePlayer;
+				await this.Clients.All.Turn(nextActivePlayer);
 			}
 		}
 		public override async Task OnConnectedAsync()
@@ -40,17 +43,22 @@ namespace TicTacToe.Hubs
 			{
 				_game.PlayerB = Context.ConnectionId;
 			}
+			else 
+			{
+				Context.Abort();
+				await base.OnConnectedAsync();
+			}
+
 			await this.Clients.Caller.Handshake(Context.ConnectionId);
 
 			if (_game.PlayerA != String.Empty & _game.PlayerB != String.Empty)
 			{
-				await this.Clients.All.Start(_game.PlayerA, 'x', _game.PlayerB, 'o');
-				await this.Clients.All.Turn('x');
-				_game.NewBoard();
+				_game.Start();
+				await this.Clients.All.Start(_game.PlayerA, _game.RoleA, _game.PlayerB, _game.RoleB);
+				await this.Clients.All.Turn(_game.ActivePlayer);
 				await this.Clients.All.UpdateBoard(_game.Board);
 			}
 
-			await base.OnConnectedAsync();
 		}
 
 		public override async Task OnDisconnectedAsync(Exception exception)

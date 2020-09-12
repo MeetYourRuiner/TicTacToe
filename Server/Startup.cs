@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TicTacToe.Hubs;
-using TicTacToe.Games;
+using TicTacToe.GameLogic;
 
 namespace TicTacToe
 {

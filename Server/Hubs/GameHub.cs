@@ -2,77 +2,88 @@ using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using System;
 using TicTacToe.GameLogic;
+using System.Linq;
 
 namespace TicTacToe.Hubs
 {
 	public class GameHub : Hub<IGameClient>
 	{
-		private IGame _game;
-		public GameHub(IGame game)
+		private IGameRepository _gameRepository;
+		public GameHub(IGameRepository gameRepository)
 		{
-			_game = game;
+			_gameRepository = gameRepository;
 		}
 		public async Task Action(byte cellIndex, char mark)
 		{
-			_game.UpdateCell(cellIndex, mark);
-			await this.Clients.All.UpdateBoard(_game.Board);
-			if (_game.CheckTie())
+			var game = _gameRepository.Games.FirstOrDefault(g => g.PlayerA == Context.ConnectionId || g.PlayerB == Context.ConnectionId);
+			game.UpdateCell(cellIndex, mark);
+			await this.Clients.Group(game.Code).UpdateBoard(game.Board);
+			if (game.CheckTie())
 			{
-				await this.Clients.All.Tie();
-				await this.Clients.All.Stop();
+				await this.Clients.Group(game.Code).Tie();
+				await this.Clients.Group(game.Code).Stop();
 			}
-			else if (_game.CheckWinner())
+			else if (game.CheckWinner())
 			{
-				await this.Clients.All.Victory(_game.GetWinner());
-				await this.Clients.All.Stop();
+				await this.Clients.Group(game.Code).Victory(game.GetWinner());
+				await this.Clients.Group(game.Code).Stop();
 			}
 			else
 			{
-				_game.NextTurn();
-				var nextActivePlayer = _game.ActivePlayer;
-				await this.Clients.All.Turn(nextActivePlayer);
+				game.NextTurn();
+				var nextActivePlayer = game.ActivePlayer;
+				await this.Clients.Group(game.Code).Turn(nextActivePlayer);
 			}
 		}
-		public override async Task OnConnectedAsync()
+
+		public async Task CreateRoom()
 		{
-			if (_game.PlayerA == String.Empty)
-			{
-				_game.PlayerA = Context.ConnectionId;
-			}
-			else if (_game.PlayerB == String.Empty)
-			{
-				_game.PlayerB = Context.ConnectionId;
-			}
-			else 
+			var game = _gameRepository.Create();
+			game.AddPlayer(Context.ConnectionId);
+			await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
+			await this.Clients.Caller.ConnectedToRoom(game.Code);
+		}
+
+		public async Task ConnectWithCode(string code)
+		{
+			var game = _gameRepository.Games.FirstOrDefault(g => g.Code == code);
+			if (game == null)
 			{
 				Context.Abort();
-				await base.OnConnectedAsync();
+				return;
 			}
-
-			await this.Clients.Caller.Handshake(Context.ConnectionId);
-
-			if (_game.PlayerA != String.Empty & _game.PlayerB != String.Empty)
+			game.AddPlayer(Context.ConnectionId);
+			await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
+			await this.Clients.Caller.ConnectedToRoom(game.Code);
+			if (game.PlayerA != String.Empty & game.PlayerB != String.Empty)
 			{
-				_game.Start();
-				await this.Clients.All.Start(_game.PlayerA, _game.RoleA, _game.PlayerB, _game.RoleB);
-				await this.Clients.All.Turn(_game.ActivePlayer);
-				await this.Clients.All.UpdateBoard(_game.Board);
+				game.Start();
+				await this.Clients.Group(game.Code).Start(game.PlayerA, game.RoleA, game.PlayerB, game.RoleB);
+				await this.Clients.Group(game.Code).Turn(game.ActivePlayer);
+				await this.Clients.Group(game.Code).UpdateBoard(game.Board);
 			}
+		}
 
+		public override async Task OnConnectedAsync()
+		{
+			await this.Clients.Caller.Handshake(Context.ConnectionId);
+			await base.OnConnectedAsync();
 		}
 
 		public override async Task OnDisconnectedAsync(Exception exception)
 		{
-			string disconnectedClient = Context.ConnectionId;
-			if (_game.PlayerA == disconnectedClient)
+			var game = _gameRepository.Games.FirstOrDefault(g => g.PlayerA == Context.ConnectionId || g.PlayerB == Context.ConnectionId);
+			if (game == null)
 			{
-				_game.PlayerA = String.Empty;
-				await this.Clients.All.Stop();
+				await base.OnDisconnectedAsync(exception);
+				return;
 			}
-			else if (_game.PlayerB == disconnectedClient)
+			game.RemovePlayer(Context.ConnectionId);
+			await this.Clients.Group(game.Code).Stop();
+			await Groups.RemoveFromGroupAsync(Context.ConnectionId, game.Code);
+			if (game.PlayerA == string.Empty && game.PlayerB == string.Empty)
 			{
-				_game.PlayerB = String.Empty;
-				await this.Clients.All.Stop();
+				_gameRepository.Games.Remove(game);
 			}
 			await base.OnDisconnectedAsync(exception);
 		}

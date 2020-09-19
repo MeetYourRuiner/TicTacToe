@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace TicTacToe.GameLogic
 {
@@ -25,12 +26,14 @@ namespace TicTacToe.GameLogic
 		};
 		private static Random random;
 		private bool isATurn;
-		private char Winner { get; set; }
 
 		public Game()
 		{
 			PlayerA = string.Empty;
 			PlayerB = string.Empty;
+			InProgress = false;
+			Code = GenerateCode(5);
+
 			random = new Random();
 		}
 
@@ -40,6 +43,9 @@ namespace TicTacToe.GameLogic
 		public char RoleB { get; set; }
 		public char[] Board { get; set; }
 		public string ActivePlayer { get; set; }
+		public string Code { get; set; }
+		public bool InProgress { get; set; }
+		private char Winner { get; set; }
 
 		public bool CheckTie()
 		{
@@ -70,6 +76,7 @@ namespace TicTacToe.GameLogic
 				ActivePlayer = PlayerB;
 				isATurn = false;
 			}
+			InProgress = true;
 		}
 
 		public void UpdateCell(byte i, char role)
@@ -106,7 +113,7 @@ namespace TicTacToe.GameLogic
 		public void NextTurn()
 		{
 			if (isATurn)
-			{ 
+			{
 				ActivePlayer = PlayerB;
 			}
 			else
@@ -114,6 +121,50 @@ namespace TicTacToe.GameLogic
 				ActivePlayer = PlayerA;
 			}
 			isATurn = !isATurn;
+		}
+
+		public void AddPlayer(string id)
+		{
+			if (PlayerA == string.Empty)
+			{
+				PlayerA = id;
+			}
+			else if (PlayerB == string.Empty)
+			{
+				PlayerB = id;
+			}
+			else
+			{
+				throw new Exception("Room is full");
+			}
+		}
+
+		public void RemovePlayer(string id)
+		{
+			if (PlayerA == id)
+			{
+				PlayerA = string.Empty;
+			}
+			else if (PlayerB == id)
+			{
+				PlayerB = string.Empty;
+			}
+			else
+			{
+				throw new Exception("Player not found");
+			}
+		}
+
+		private string GenerateCode(int length)
+		{
+			var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			var random = new Random();
+			var result = new string(
+				Enumerable.Repeat(chars, length)
+				  .Select(s => s[random.Next(s.Length)])
+				  .ToArray()
+				);
+			return result;
 		}
 	}
 }

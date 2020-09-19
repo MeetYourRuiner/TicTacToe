@@ -11,5 +11,6 @@ namespace TicTacToe.Hubs
 		Task Start(string playerAid, char markA, string playerBid, char markB);
 		Task Stop();
 		Task Handshake(string clientId);
+		Task ConnectedToRoom(string code);
 	}
 }

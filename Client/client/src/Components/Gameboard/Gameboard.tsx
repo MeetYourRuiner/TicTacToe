@@ -1,5 +1,7 @@
 import * as signalR from "@microsoft/signalr";
+import { stringify } from "querystring";
 import React from "react";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import "./Gameboard.css";
 
 interface IState {
@@ -12,9 +14,14 @@ interface IState {
 	isMyTurn: boolean;
 	isGameStopped: boolean;
 	status: string;
+	code: string;
 }
 
-class TicTacToe extends React.Component<{}, IState> {
+interface IPathProps {}
+
+interface IOwnProps extends RouteComponentProps<IPathProps> {}
+
+class Gameboard extends React.Component<IOwnProps, IState> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -27,6 +34,7 @@ class TicTacToe extends React.Component<{}, IState> {
 			status: "Game is not started",
 			hubConnection: undefined,
 			board: new Array<string>().fill(" "),
+			code: "",
 		};
 	}
 
@@ -87,16 +95,46 @@ class TicTacToe extends React.Component<{}, IState> {
 		);
 
 		hubConnection.on("stop", async () => {
-			await this.state.hubConnection?.stop();
 			this.setState({ status: "Game ended", isGameStopped: true });
 		});
 
-		hubConnection.start().catch((err) => console.log(err));
+		hubConnection.on("connectedToRoom", (code: string) => {
+			if (this.state.code === "") {
+				this.setState({ code: code });
+				this.props.history.replace(`/game?code=${code}`);
+			}
+		});
+
+		hubConnection
+			.start()
+			.then(() => {
+				let query = this.props.location.search;
+				if (query === "") {
+					this.createRoom();
+				} else {
+					let code: string = query.substring(6);
+					this.setState({ code: code });
+					this.connectWithCode(code);
+				}
+			})
+			.catch((err) => console.log(err));
+	}
+
+	async createRoom() {
+		await this.state.hubConnection?.invoke("createRoom");
+	}
+
+	async connectWithCode(code: string) {
+		await this.state.hubConnection?.invoke("connectWithCode", code);
 	}
 
 	async handleClick(i: number) {
 		if (this.state.isMyTurn && !this.state.isGameStopped)
-			await this.state.hubConnection?.invoke("action", i, this.state.myRole);
+			await this.state.hubConnection?.invoke(
+				"action",
+				i,
+				this.state.myRole
+			);
 	}
 
 	renderBoard() {
@@ -146,4 +184,4 @@ class TicTacToe extends React.Component<{}, IState> {
 	}
 }
 
-export default TicTacToe;
+export default withRouter(Gameboard);

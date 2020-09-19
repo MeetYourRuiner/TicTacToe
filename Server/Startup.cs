@@ -26,7 +26,7 @@ namespace TicTacToe
 					.WithOrigins("http://localhost:3000")
 					.AllowCredentials();
 			}));
-			services.AddSingleton<IGame>(new Game());
+            services.AddSingleton<IGameRepository>(new GameRepository());
 			services.AddSignalR();
         }
 

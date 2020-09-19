@@ -3,15 +3,51 @@
 	width: 60%;
 	min-width: 600px;
 	position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-html, body, #root, .App {
+html,
+body,
+#root,
+.App {
 	height: 100%;
 }
 
 body {
 	background-color: #81b214;
+}
+
+.btn {
+	border: none;
+    font-family: inherit;
+    font-size: 20pt;
+    cursor: pointer;
+    padding: 5% 0;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    outline: none;
+    position: relative;
+	background: #cb4e4e;
+    color: #fff;
+    box-shadow: 0 6px #ab3c3c;
+	border-radius: 40px;
+    -webkit-transition: none;
+    -moz-transition: none;
+	transition: none;
+}
+.btn:active {
+	box-shadow: 0 0 #ab3c3c;
+	top: 6px;
+}
+
+.textbox {
+	padding: 0 12px;
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
 }

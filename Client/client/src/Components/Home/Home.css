@@ -1,0 +1,23 @@
+.Home {
+	width: 100%;
+	padding: 0 25%;
+}
+
+.btn.create-room {
+	width: 100%;
+	margin-bottom: 10%;
+}
+
+.btn.enter-room {
+	width: 55%;
+}
+
+.textbox.code {
+	text-transform: uppercase;
+	margin-right: 5%;
+	width: 40%;
+    text-align: center;
+    padding: 20px 10px;
+    font-size: 30pt;
+	vertical-align: bottom;
+}

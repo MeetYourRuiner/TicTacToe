@@ -1,7 +1,7 @@
 import * as signalR from "@microsoft/signalr";
-import { stringify } from "querystring";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import { ErrorCodes } from "../../enums/ErrorCodes";
 import "./Gameboard.css";
 
 interface IState {
@@ -103,6 +103,12 @@ class Gameboard extends React.Component<IOwnProps, IState> {
 				this.setState({ code: code });
 				this.props.history.replace(`/game?code=${code}`);
 			}
+		});
+
+		hubConnection.on("error", (errorCode: ErrorCodes) => {
+			this.state.hubConnection
+				?.stop()
+				.finally(() => this.props.history.push("/"));
 		});
 
 		hubConnection

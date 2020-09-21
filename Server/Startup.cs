@@ -12,12 +12,12 @@ using TicTacToe.GameLogic;
 
 namespace TicTacToe
 {
-    public class Startup
-    {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
+	public class Startup
+	{
+		// This method gets called by the runtime. Use this method to add services to the container.
+		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+		public void ConfigureServices(IServiceCollection services)
+		{
 			services.AddCors(o => o.AddDefaultPolicy(builder =>
 			{
 				builder
@@ -26,26 +26,30 @@ namespace TicTacToe
 					.WithOrigins("http://localhost:3000")
 					.AllowCredentials();
 			}));
-            services.AddSingleton<IGameRepository>(new GameRepository());
+			services.AddSingleton<IRoomRepository>(new RoomRepository());
+			services.AddControllers();
 			services.AddSignalR();
-        }
+		}
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-			
-            app.UseRouting();
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
 
-    		app.UseCors();
+			app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<GameHub>("/game");
-            });
-        }
-    }
+			app.UseCors();
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllerRoute(
+					name: "default",
+					pattern: "{controller=Home}/{action=Index}/{id?}");
+				endpoints.MapHub<GameHub>("/game");
+			});
+		}
+	}
 }

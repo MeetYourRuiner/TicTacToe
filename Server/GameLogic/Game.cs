@@ -25,27 +25,24 @@ namespace TicTacToe.GameLogic
 			new int[] { 2, 4, 6 }
 		};
 		private static Random random;
-		private bool isATurn;
 
 		public Game()
 		{
-			PlayerA = string.Empty;
-			PlayerB = string.Empty;
 			InProgress = false;
-			Code = GenerateCode(5);
-
 			random = new Random();
 		}
-
-		public string PlayerA { get; set; }
-		public string PlayerB { get; set; }
 		public char RoleA { get; set; }
 		public char RoleB { get; set; }
 		public char[] Board { get; set; }
-		public string ActivePlayer { get; set; }
-		public string Code { get; set; }
+		public Players ActivePlayer { get; set; }
 		public bool InProgress { get; set; }
 		private char Winner { get; set; }
+
+		public enum Players
+		{
+			A,
+			B
+		}
 
 		public bool CheckTie()
 		{
@@ -66,15 +63,13 @@ namespace TicTacToe.GameLogic
 			{
 				RoleA = 'x';
 				RoleB = 'o';
-				ActivePlayer = PlayerA;
-				isATurn = true;
+				ActivePlayer = Players.A;
 			}
 			else
 			{
 				RoleA = 'o';
 				RoleB = 'x';
-				ActivePlayer = PlayerB;
-				isATurn = false;
+				ActivePlayer = Players.B;
 			}
 			InProgress = true;
 		}
@@ -102,69 +97,24 @@ namespace TicTacToe.GameLogic
 			return false;
 		}
 
-		public string GetWinner()
+		public Players GetWinner()
 		{
 			if (Winner == RoleA)
-				return PlayerA;
+				return Players.A;
 			else
-				return PlayerB;
+				return Players.B;
 		}
 
 		public void NextTurn()
 		{
-			if (isATurn)
+			if (ActivePlayer == Players.A)
 			{
-				ActivePlayer = PlayerB;
+				ActivePlayer = Players.B;
 			}
 			else
 			{
-				ActivePlayer = PlayerA;
+				ActivePlayer = Players.A;
 			}
-			isATurn = !isATurn;
-		}
-
-		public void AddPlayer(string id)
-		{
-			if (PlayerA == string.Empty)
-			{
-				PlayerA = id;
-			}
-			else if (PlayerB == string.Empty)
-			{
-				PlayerB = id;
-			}
-			else
-			{
-				throw new Exception("Room is full");
-			}
-		}
-
-		public void RemovePlayer(string id)
-		{
-			if (PlayerA == id)
-			{
-				PlayerA = string.Empty;
-			}
-			else if (PlayerB == id)
-			{
-				PlayerB = string.Empty;
-			}
-			else
-			{
-				throw new Exception("Player not found");
-			}
-		}
-
-		private string GenerateCode(int length)
-		{
-			var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-			var random = new Random();
-			var result = new string(
-				Enumerable.Repeat(chars, length)
-				  .Select(s => s[random.Next(s.Length)])
-				  .ToArray()
-				);
-			return result;
 		}
 	}
 }

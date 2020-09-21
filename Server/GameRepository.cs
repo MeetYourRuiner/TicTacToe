@@ -1,23 +1,54 @@
 using System.Collections.Generic;
+using System.Linq;
 using TicTacToe.GameLogic;
+using TicTacToe.RoomNS;
+using TicTacToe.CustomExceptions;
 
 namespace TicTacToe
 {
-	public interface IGameRepository
+	public interface IRoomRepository
 	{
-		List<Game> Games { get; }
-		Game Create();
+		List<Room> Rooms { get; }
+		Room Create();
+		Room FindByPlayerID(string id);
+		Room FindByCode(string code);
 	}
 
-	public class GameRepository : IGameRepository
+	public class RoomRepository : IRoomRepository
 	{
-		public List<Game> Games { get; } = new List<Game>();
+		public List<Room> Rooms { get; } = new List<Room>();
 
-		public Game Create()
+		public Room Create()
 		{
-			var game = new Game();
-			Games.Add(game);
-			return game;
+			var room = new Room();
+			Rooms.Add(room);
+			return room;
+		}
+
+		public Room FindByPlayerID(string id)
+		{
+			var Room = Rooms.FirstOrDefault(g => g.PlayerAId == id || g.PlayerBId == id);
+			if (Room != null)
+			{
+				return Room;
+			}
+			else
+			{
+				throw new RoomException(ErrorCodes.RoomNotFound.ToString(), ErrorCodes.RoomNotFound);
+			}
+		}
+
+		public Room FindByCode(string code)
+		{
+			var Room = Rooms.FirstOrDefault(g => g.Code == code);
+			if (Room != null)
+			{
+				return Room;
+			}
+			else
+			{
+				throw new RoomException(ErrorCodes.RoomNotFound.ToString(), ErrorCodes.RoomNotFound);
+			}
 		}
 	}
 }

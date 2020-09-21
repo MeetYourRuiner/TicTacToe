@@ -1,66 +1,64 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using System;
-using TicTacToe.GameLogic;
 using System.Linq;
+using TicTacToe.CustomExceptions;
 
 namespace TicTacToe.Hubs
 {
 	public class GameHub : Hub<IGameClient>
 	{
-		private IGameRepository _gameRepository;
-		public GameHub(IGameRepository gameRepository)
+		private IRoomRepository _roomRepository;
+		public GameHub(IRoomRepository roomRepository)
 		{
-			_gameRepository = gameRepository;
+			_roomRepository = roomRepository;
 		}
 		public async Task Action(byte cellIndex, char mark)
 		{
-			var game = _gameRepository.Games.FirstOrDefault(g => g.PlayerA == Context.ConnectionId || g.PlayerB == Context.ConnectionId);
+			var room = _roomRepository.FindByPlayerID(Context.ConnectionId);
+			var game = room.Game;
 			game.UpdateCell(cellIndex, mark);
-			await this.Clients.Group(game.Code).UpdateBoard(game.Board);
+			await this.Clients.Group(room.Code).UpdateBoard(game.Board);
 			if (game.CheckTie())
 			{
-				await this.Clients.Group(game.Code).Tie();
-				await this.Clients.Group(game.Code).Stop();
+				await this.Clients.Group(room.Code).Tie();
+				await this.Clients.Group(room.Code).Stop();
 			}
 			else if (game.CheckWinner())
 			{
-				await this.Clients.Group(game.Code).Victory(game.GetWinner());
-				await this.Clients.Group(game.Code).Stop();
+				var winner = game.GetWinner();
+				var winnerId = room.GetPlayerId(winner);
+				await this.Clients.Group(room.Code).Victory(winnerId);
+				await this.Clients.Group(room.Code).Stop();
 			}
 			else
 			{
 				game.NextTurn();
-				var nextActivePlayer = game.ActivePlayer;
-				await this.Clients.Group(game.Code).Turn(nextActivePlayer);
+				var nextActivePlayerId = room.GetPlayerId(game.ActivePlayer);
+				await this.Clients.Group(room.Code).Turn(nextActivePlayerId);
 			}
 		}
 
-		public async Task CreateRoom()
+		public async Task Connect(string code)
 		{
-			var game = _gameRepository.Create();
-			game.AddPlayer(Context.ConnectionId);
-			await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
-			await this.Clients.Caller.ConnectedToRoom(game.Code);
-		}
-
-		public async Task ConnectWithCode(string code)
-		{
-			var game = _gameRepository.Games.FirstOrDefault(g => g.Code == code);
-			if (game == null)
+			try
 			{
-				Context.Abort();
-				return;
+				var room = _roomRepository.FindByCode(code);
+				var game = room.Game;
+				room.AddPlayer(Context.ConnectionId);
+				await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
+				await this.Clients.Caller.ConnectedToRoom(room.Code);
+				if (room.IsFull())
+				{
+					game.Start();
+					await this.Clients.Group(room.Code).Start(room.PlayerAId, game.RoleA, room.PlayerBId, game.RoleB);
+					await this.Clients.Group(room.Code).Turn(room.GetPlayerId(game.ActivePlayer));
+					await this.Clients.Group(room.Code).UpdateBoard(game.Board);
+				}
 			}
-			game.AddPlayer(Context.ConnectionId);
-			await Groups.AddToGroupAsync(Context.ConnectionId, game.Code);
-			await this.Clients.Caller.ConnectedToRoom(game.Code);
-			if (game.PlayerA != String.Empty & game.PlayerB != String.Empty)
+			catch (RoomException ex)
 			{
-				game.Start();
-				await this.Clients.Group(game.Code).Start(game.PlayerA, game.RoleA, game.PlayerB, game.RoleB);
-				await this.Clients.Group(game.Code).Turn(game.ActivePlayer);
-				await this.Clients.Group(game.Code).UpdateBoard(game.Board);
+				await this.Clients.Caller.Error(ex.ErrorCode);
 			}
 		}
 
@@ -72,20 +70,22 @@ namespace TicTacToe.Hubs
 
 		public override async Task OnDisconnectedAsync(Exception exception)
 		{
-			var game = _gameRepository.Games.FirstOrDefault(g => g.PlayerA == Context.ConnectionId || g.PlayerB == Context.ConnectionId);
-			if (game == null)
+			try
+			{
+				var room = _roomRepository.FindByPlayerID(Context.ConnectionId);
+				room.RemovePlayer(Context.ConnectionId);
+				await this.Clients.Group(room.Code).Stop();
+				await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Code);
+				if (room.IsEmpty())
+				{
+					_roomRepository.Rooms.Remove(room);
+				}
+			}
+			catch { }
+			finally
 			{
 				await base.OnDisconnectedAsync(exception);
-				return;
 			}
-			game.RemovePlayer(Context.ConnectionId);
-			await this.Clients.Group(game.Code).Stop();
-			await Groups.RemoveFromGroupAsync(Context.ConnectionId, game.Code);
-			if (game.PlayerA == string.Empty && game.PlayerB == string.Empty)
-			{
-				_gameRepository.Games.Remove(game);
-			}
-			await base.OnDisconnectedAsync(exception);
 		}
 	}
 

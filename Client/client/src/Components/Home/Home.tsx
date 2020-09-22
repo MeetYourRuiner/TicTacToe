@@ -1,15 +1,46 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import APIService from "../../api/api";
+import RoomError from "../../errors/RoomError";
 import "./Home.css";
 
 function Home() {
-	const [code, setCode] = useState<string>();
+	const [code, setCode] = useState<string>("");
+	let history = useHistory();
+
+	const handleClickCreateRoom = async () => {
+		try {
+			let roomCode: string = await APIService.CreateRoom();
+			history.push(`/room?code=${roomCode}`);
+		} catch (err) {
+			if (err instanceof RoomError) {
+				console.log(err.Code);
+			}
+		}
+	};
+
+	const handleClickEnterRoom = async () => {
+		try {
+			let isAllowedToEnter: boolean = await APIService.GetRoomState(code);
+			if (isAllowedToEnter) {
+				history.push(`/room?code=${code}`);
+			}
+		} catch (err) {
+			if (err instanceof RoomError) {
+				console.log(err.Code);
+			}
+		}
+	};
+
 	return (
 		<div className="Home">
-			<Link to="/game">
-				<button className="btn create-room">Create room</button>
-				<br />
-			</Link>
+			<button
+				className="btn create-room"
+				onClick={() => handleClickCreateRoom()}
+			>
+				Create room
+			</button>
+			<br />
 			<input
 				onChange={(e) => {
 					setCode(e.target.value);
@@ -19,9 +50,12 @@ function Home() {
 				type="text"
 				name="code"
 			/>
-			<Link to={`/game?code=${code}`}>
-				<button className="btn enter-room">Enter the room</button>
-			</Link>
+			<button
+				className="btn enter-room"
+				onClick={() => handleClickEnterRoom()}
+			>
+				Enter the room
+			</button>
 		</div>
 	);
 }

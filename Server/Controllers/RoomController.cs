@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using TicTacToe;
-using TicTacToe.GameLogic;
 using TicTacToe.CustomExceptions;
 
 namespace TicTacToe.Controllers
@@ -16,8 +13,9 @@ namespace TicTacToe.Controllers
 			_roomRepository = roomRepository;
 		}
 
-		// GET: api/room
+		// GET: api/room/create
 		[HttpGet]
+		[Route("create")]
 		public ActionResult<string> CreateRoom()
 		{
 			try
@@ -27,25 +25,40 @@ namespace TicTacToe.Controllers
 			}
 			catch
 			{
-				return new StatusCodeResult(500);
+				return new StatusCodeResult(500); // Internal Error
 			}
 		}
 
 		// GET: api/room?code=AAAAA
 		[HttpGet]
-		public ActionResult ConnectWithCode(string code)
+		public ActionResult GetRoomState(string code)
 		{
 			try
 			{
+				code = code.ToUpper();
 				var room = _roomRepository.FindByCode(code);
 				if (!room.IsFull())
 					return Ok();
 				else
 					throw new RoomException(ErrorCodes.RoomIsFull.ToString(), ErrorCodes.RoomIsFull);
 			}
-			catch
+			catch (RoomException ex)
 			{
-				return new NotFoundResult();
+				switch(ex.ErrorCode)
+				{
+					case ErrorCodes.RoomIsFull:
+					{
+						return new NotFoundObjectResult(ErrorCodes.RoomIsFull);
+					}
+					case ErrorCodes.RoomNotFound:
+					{
+						return new NotFoundObjectResult(ErrorCodes.RoomNotFound);
+					}
+					default:
+					{
+						return new StatusCodeResult(500);
+					}
+				}
 			}
 		}
 	}

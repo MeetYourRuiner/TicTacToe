@@ -1,4 +1,6 @@
 export enum ErrorCodes {
 	RoomIsFull,
-	RoomNotFound
+	RoomNotFound,
+	RoomIsFailedToCreate,
+	ServerError
 }

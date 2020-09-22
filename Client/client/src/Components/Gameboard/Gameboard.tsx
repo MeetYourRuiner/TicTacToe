@@ -95,14 +95,7 @@ class Gameboard extends React.Component<IOwnProps, IState> {
 		);
 
 		hubConnection.on("stop", async () => {
-			this.setState({ status: "Game ended", isGameStopped: true });
-		});
-
-		hubConnection.on("connectedToRoom", (code: string) => {
-			if (this.state.code === "") {
-				this.setState({ code: code });
-				this.props.history.replace(`/game?code=${code}`);
-			}
+			this.setState({ isGameStopped: true });
 		});
 
 		hubConnection.on("error", (errorCode: ErrorCodes) => {
@@ -115,23 +108,15 @@ class Gameboard extends React.Component<IOwnProps, IState> {
 			.start()
 			.then(() => {
 				let query = this.props.location.search;
-				if (query === "") {
-					this.createRoom();
-				} else {
-					let code: string = query.substring(6);
-					this.setState({ code: code });
-					this.connectWithCode(code);
-				}
+				let code: string = query.substring(6);
+				this.setState({ code: code });
+				this.connect(code);
 			})
 			.catch((err) => console.log(err));
 	}
 
-	async createRoom() {
-		await this.state.hubConnection?.invoke("createRoom");
-	}
-
-	async connectWithCode(code: string) {
-		await this.state.hubConnection?.invoke("connectWithCode", code);
+	async connect(code: string) {
+		await this.state.hubConnection?.invoke("connect", code);
 	}
 
 	async handleClick(i: number) {

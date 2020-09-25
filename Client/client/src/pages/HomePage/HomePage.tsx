@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import APIService from "../../api/api";
 import RoomError from "../../errors/RoomError";
-import "./Home.css";
+import "./HomePage.css";
 
-function Home() {
+function HomePage() {
 	const [code, setCode] = useState<string>("");
 	let history = useHistory();
 
@@ -60,4 +60,4 @@ function Home() {
 	);
 }
 
-export default Home;
+export default HomePage;

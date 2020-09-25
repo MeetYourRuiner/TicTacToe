@@ -1,11 +1,19 @@
 import React from "react";
 
+import "./Status.css";
+
 interface IStatusProps {
 	value: string;
 }
 
 function Status(props: IStatusProps) {
-	return <div className="status">{props.value}</div>;
+	return (
+		<div className="status-wrapper">
+			<div className="status-text">
+				{props.value}
+			</div>
+		</div>
+	);
 }
 
 export default Status;

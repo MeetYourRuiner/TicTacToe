@@ -6,6 +6,8 @@ import Status from "../../components/Status/Status";
 import * as signalR from "@microsoft/signalr";
 import { ErrorCodes } from "../../enums/ErrorCodes";
 
+import "./GamePage.css";
+
 interface IGamepageState {
 	code: string,
 	status: string,
@@ -52,7 +54,8 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 		});
 
 		this.hub.on("victory", (winnerId: string) => {
-			this.setState({status: winnerId + " won"});
+			let winner: string = winnerId === this.state.myId ? "You" : "Opponent";
+			this.setState({status: winner + " won"});
 		});
 
 		this.hub.on("tie", () => {
@@ -80,6 +83,10 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			}
 		);
 
+		this.hub.on("connected", () => {
+			this.setState({status: "Waiting for opponent"});
+		});
+
 		this.hub.on("stop", async () => {
 			this.setState({isGameStopped: true});
 		});
@@ -101,7 +108,9 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			.catch((err) => console.log(err));
 	}
 		
-	
+	componentWillUnmount() {
+		this.hub.stop().catch((err) => console.log(err));
+	}
 
 	async connect(code: string) {
 		await this.hub.invoke("connect", code);

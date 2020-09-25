@@ -49,6 +49,7 @@ function HomePage() {
 				className="textbox code"
 				type="text"
 				name="code"
+				placeholder="CODE"
 			/>
 			<button
 				className="btn enter-room"

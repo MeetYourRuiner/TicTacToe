@@ -60,6 +60,9 @@ namespace TicTacToe.Controllers
 					}
 				}
 			}
+			catch (System.NullReferenceException) {
+				return new BadRequestResult();
+			}
 		}
 	}
 }

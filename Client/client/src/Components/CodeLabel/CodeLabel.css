@@ -1,0 +1,17 @@
+.code-label-wrapper {
+    position: relative;
+    display: table;
+	border: 3px #ab3c3c dashed;
+	cursor: pointer;
+	float: right;
+	padding: 2%;
+}
+
+.code-label-text {
+    font-size: 20pt;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #fff;
+	text-align: center;
+	font-family: monospace;
+}

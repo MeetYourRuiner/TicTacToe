@@ -1,7 +1,3 @@
-.game {
-	text-align: center;
-}
-
 .board {
 	margin: 0 auto;
 }
@@ -9,14 +5,15 @@
 .board td {
 	width: 100px;
 	height: 100px;
-	border: 3px #206a5d solid;
 	border-radius: 10px;
 	background-color: #f1f1e8;
+	text-align: center;
 }
 
 .mark {
 	font-size: 50pt;
     margin: 0;
     top: -8%;
-    position: relative;
+	position: relative;
+	font-family: cursive;
 }

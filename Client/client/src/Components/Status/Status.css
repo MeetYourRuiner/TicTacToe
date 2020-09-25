@@ -1,0 +1,15 @@
+.status-wrapper {
+	width: 314px;
+    position: relative;
+	display: inline-block;
+}
+
+.status-text {
+    font-size: 15pt;
+    padding: 5% 0;
+	word-wrap: break-word;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+	text-align: center;
+}

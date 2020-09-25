@@ -1,0 +1,14 @@
+.game-page > .status-wrapper {
+	margin-bottom: 10px;
+}
+
+.game-page > .code-label-wrapper {
+	margin-top: 10px;
+}
+
+.game-page {
+	background: #cb4e4e;
+    padding: 3% 3% 10px 3%;
+	box-shadow: 0 6px #ab3c3c;
+	border-radius: 3%;
+}

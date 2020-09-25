@@ -47,6 +47,7 @@ namespace TicTacToe.Hubs
 				var game = room.Game;
 				room.AddPlayer(Context.ConnectionId);
 				await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
+				await this.Clients.Caller.Connected();
 				if (room.IsFull())
 				{
 					game.Start();

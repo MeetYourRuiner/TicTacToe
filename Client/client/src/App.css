@@ -22,13 +22,13 @@ body {
 .btn {
 	border: none;
     font-family: inherit;
-    font-size: 20pt;
+    font-size: 15pt;
+    font-weight: normal;
     cursor: pointer;
-    padding: 5% 0;
+    padding: 20px 40px;
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-weight: 700;
     outline: none;
     position: relative;
 	background: #cb4e4e;

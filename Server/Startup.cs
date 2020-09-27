@@ -23,7 +23,7 @@ namespace TicTacToe
 				builder
 					.AllowAnyMethod()
 					.AllowAnyHeader()
-					.WithOrigins("http://localhost:3000")
+					.WithOrigins("http://localhost:3000", "http://192.168.0.106:3000")
 					.AllowCredentials();
 			}));
 			services.AddSingleton<IRoomRepository>(new RoomRepository());

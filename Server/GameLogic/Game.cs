@@ -28,14 +28,12 @@ namespace TicTacToe.GameLogic
 
 		public Game()
 		{
-			InProgress = false;
 			random = new Random();
 		}
 		public char RoleA { get; set; }
 		public char RoleB { get; set; }
 		public char[] Board { get; set; }
 		public Players ActivePlayer { get; set; }
-		public bool InProgress { get; set; }
 		private char Winner { get; set; }
 
 		public enum Players
@@ -71,7 +69,6 @@ namespace TicTacToe.GameLogic
 				RoleB = 'x';
 				ActivePlayer = Players.B;
 			}
-			InProgress = true;
 		}
 
 		public void UpdateCell(byte i, char role)

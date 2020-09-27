@@ -2,7 +2,6 @@ namespace TicTacToe.GameLogic
 {
 	public interface IGame
 	{
-		bool InProgress { get; set; }
 		char[] Board { get; set; }
 		char RoleA { get; set; }
 		char RoleB { get; set; }

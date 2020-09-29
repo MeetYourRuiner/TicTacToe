@@ -1,14 +1,53 @@
 .game-page > .status-wrapper {
 	margin-bottom: 10px;
+	z-index: 2;
 }
 
 .game-page > .code-label-wrapper {
 	margin-top: 10px;
+	z-index: 2;
 }
 
 .game-page {
 	background: #cb4e4e;
-    padding: 3% 3% 10px 3%;
+    padding: 24px;
 	box-shadow: 0 6px #ab3c3c;
 	border-radius: 3%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.game-page .leave-room {
+	align-self: flex-start;
+	padding: 5px 20px;
+	background-color: inherit;
+	position: absolute;
+	left: -61px;
+	top: 0;
+}
+
+.game-page .leave-room:active {
+    top: 6px;
+}
+
+.game-page .ready {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+}
+
+.game-page .blackout {
+	top: 0;
+	right: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	box-shadow: 0 6px black;
+	border-radius: 3%;
+	background-color: black;
+	opacity: 30%;
 }

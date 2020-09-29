@@ -13,5 +13,6 @@ namespace TicTacToe.Hubs
 		Task Handshake(string clientId);
 		Task Error(ErrorCodes errorCode);
 		Task Connected();
+		Task ReadyCheck();
 	}
 }

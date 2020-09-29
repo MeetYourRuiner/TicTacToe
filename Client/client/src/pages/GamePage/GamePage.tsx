@@ -9,13 +9,15 @@ import { ErrorCodes } from "../../enums/ErrorCodes";
 import "./GamePage.css";
 
 interface IGamepageState {
-	code: string,
-	status: string,
-	myId: string,
-	board: string[],
-	isMyTurn: boolean,
-	isGameStopped: boolean,
-	myRole: string
+	code: string;
+	status: string;
+	myId: string;
+	board: string[];
+	isMyTurn: boolean;
+	isGameStopped: boolean;
+	myRole: string;
+	isWaitingForReadiness: boolean;
+	isReadyPressed: boolean;
 }
 
 interface IPathProps {}
@@ -36,34 +38,36 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			myRole: "",
 			board: new Array<string>().fill(" "),
 			isMyTurn: false,
-			isGameStopped: false,
-		}
+			isGameStopped: true,
+			isWaitingForReadiness: false,
+			isReadyPressed: false,
+		};
 	}
 	componentDidMount() {
 		this.hub.on("updateBoard", (board: string[]) => {
-			this.setState({board:board});
+			this.setState({ board: board });
 		});
 
 		this.hub.on("turn", (playerId: string) => {
 			if (this.state.myId === playerId) {
-				this.setState({isMyTurn: true, status:"Your turn"});
-			}
-			else {
-				this.setState({isMyTurn: true, status:"Opponent's turn"});
+				this.setState({ isMyTurn: true, status: "Your turn" });
+			} else {
+				this.setState({ isMyTurn: true, status: "Opponent's turn" });
 			}
 		});
 
 		this.hub.on("victory", (winnerId: string) => {
-			let winner: string = winnerId === this.state.myId ? "You" : "Opponent";
-			this.setState({status: winner + " won"});
+			let winner: string =
+				winnerId === this.state.myId ? "You" : "Opponent";
+			this.setState({ status: winner + " won" });
 		});
 
 		this.hub.on("tie", () => {
-			this.setState({status: "Tie"});
+			this.setState({ status: "Tie" });
 		});
 
 		this.hub.on("handshake", (myId: string) => {
-			this.setState({myId: myId});
+			this.setState({ myId: myId });
 		});
 
 		this.hub.on(
@@ -75,26 +79,37 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 				roleB: string
 			) => {
 				if (playerAId === this.state.myId) {
-					this.setState({myRole: roleA});
+					this.setState({ myRole: roleA });
 				} else {
-					this.setState({myRole: roleB});
+					this.setState({ myRole: roleB });
 				}
-				this.setState({isGameStopped: false});
+				this.setState({
+					isGameStopped: false,
+					isWaitingForReadiness: false,
+				});
 			}
 		);
 
 		this.hub.on("connected", () => {
-			this.setState({status: "Waiting for opponent"});
+			this.setState({ status: "Waiting for opponent" });
 		});
 
 		this.hub.on("stop", async () => {
-			this.setState({isGameStopped: true});
+			this.setState({
+				isGameStopped: true,
+				isWaitingForReadiness: false,
+			});
 		});
 
 		this.hub.on("error", (errorCode: ErrorCodes) => {
-			this.hub
-				?.stop()
-				.finally(() => this.props.history.push("/"));
+			this.pushToHomePage();
+		});
+
+		this.hub.on("readyCheck", () => {
+			this.setState({
+				isWaitingForReadiness: true,
+				isReadyPressed: false,
+			});
 		});
 
 		this.hub
@@ -102,12 +117,12 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			.then(() => {
 				let query = this.props.location.search;
 				let code: string = query.substring(6);
-				this.setState({code: code});
+				this.setState({ code: code });
 				this.connect(code);
 			})
 			.catch((err) => console.log(err));
 	}
-		
+
 	componentWillUnmount() {
 		this.hub.stop().catch((err) => console.log(err));
 	}
@@ -115,27 +130,58 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 	async connect(code: string) {
 		await this.hub.invoke("connect", code);
 	}
-	
+
+	async ready() {
+		await this.hub
+			.invoke("ready")
+			.then(() => this.setState({ isReadyPressed: true }));
+	}
+
 	async handleClick(i: number) {
-		if (this.state.isMyTurn && !this.state.isGameStopped)
-		{
-			await this.hub.invoke(
-				"action",
-				i,
-				this.state.myRole
-			);
+		if (this.state.isMyTurn && !this.state.isGameStopped) {
+			await this.hub.invoke("action", i, this.state.myRole);
 		}
+	}
+
+	handleClickLeaveRoom() {
+		this.pushToHomePage();
+	}
+
+	private pushToHomePage() {
+		this.hub.stop().finally(() => this.props.history.push("/"));
 	}
 
 	render() {
 		return (
 			<div className="game-page">
-				<Status value={this.state.status}/>
-				<Gameboard value={this.state.board} onCellClick={(index: number) => this.handleClick(index)}/>
-				<CodeLabel value={this.state.code}/>
+				<button
+					className="btn leave-room"
+					onClick={() => this.handleClickLeaveRoom()}
+				>
+					&#129120;
+				</button>
+				<Status value={this.state.status} />
+				<Gameboard
+					value={this.state.board}
+					onCellClick={(index: number) => this.handleClick(index)}
+				/>
+				<CodeLabel value={this.state.code} />
+				{this.state.isWaitingForReadiness && (
+					<button
+						onClick={() => this.ready()}
+						className="btn ready"
+						disabled={this.state.isReadyPressed}
+					>
+						Ready
+					</button>
+				)}
+				{(this.state.isGameStopped ||
+					this.state.isWaitingForReadiness) && (
+					<div className="blackout" />
+				)}
 			</div>
-		)
-	} 
+		);
+	}
 }
 
 export default withRouter(GamePage);

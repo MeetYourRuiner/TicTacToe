@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using System;
-using System.Linq;
 using TicTacToe.CustomExceptions;
 
 namespace TicTacToe.Hubs
@@ -23,6 +22,8 @@ namespace TicTacToe.Hubs
 			{
 				await this.Clients.Group(room.Code).Tie();
 				await this.Clients.Group(room.Code).Stop();
+				room.ResetReadiness();
+				await this.Clients.Group(room.Code).ReadyCheck();
 			}
 			else if (game.CheckWinner())
 			{
@@ -30,12 +31,28 @@ namespace TicTacToe.Hubs
 				var winnerId = room.GetPlayerId(winner);
 				await this.Clients.Group(room.Code).Victory(winnerId);
 				await this.Clients.Group(room.Code).Stop();
+				room.ResetReadiness();
+				await this.Clients.Group(room.Code).ReadyCheck();
 			}
 			else
 			{
 				game.NextTurn();
 				var nextActivePlayerId = room.GetPlayerId(game.ActivePlayer);
 				await this.Clients.Group(room.Code).Turn(nextActivePlayerId);
+			}
+		}
+
+		public async Task Ready()
+		{
+			var room = _roomRepository.FindByPlayerID(Context.ConnectionId);
+			room.SetReadiness(Context.ConnectionId);
+			if (room.ArePlayersReady())
+			{
+				var game = room.Game;
+				game.Start();
+				await this.Clients.Group(room.Code).Start(room.PlayerAId, game.RoleA, room.PlayerBId, game.RoleB);
+				await this.Clients.Group(room.Code).Turn(room.GetPlayerId(game.ActivePlayer));
+				await this.Clients.Group(room.Code).UpdateBoard(game.Board);
 			}
 		}
 
@@ -50,10 +67,8 @@ namespace TicTacToe.Hubs
 				await this.Clients.Caller.Connected();
 				if (room.IsFull())
 				{
-					game.Start();
-					await this.Clients.Group(room.Code).Start(room.PlayerAId, game.RoleA, room.PlayerBId, game.RoleB);
-					await this.Clients.Group(room.Code).Turn(room.GetPlayerId(game.ActivePlayer));
-					await this.Clients.Group(room.Code).UpdateBoard(game.Board);
+					room.ResetReadiness();
+					await this.Clients.Group(room.Code).ReadyCheck();
 				}
 			}
 			catch (RoomException ex)

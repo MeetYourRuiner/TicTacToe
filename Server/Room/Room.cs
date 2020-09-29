@@ -11,6 +11,8 @@ namespace TicTacToe.RoomNS
 		public string Code { get; set; }
 		public string PlayerAId { get; set; }
 		public string PlayerBId { get; set; }
+		public bool PlayerAReadiness { get; set; }
+		public bool PlayerBReadiness { get; set; }
 
 		public Room()
 		{
@@ -46,10 +48,12 @@ namespace TicTacToe.RoomNS
 			if (PlayerAId == id)
 			{
 				PlayerAId = string.Empty;
+				PlayerAReadiness = false;
 			}
 			else if (PlayerBId == id)
 			{
 				PlayerBId = string.Empty;
+				PlayerBReadiness = false;
 			}
 		}
 
@@ -79,6 +83,29 @@ namespace TicTacToe.RoomNS
 				  .ToArray()
 				);
 			return result;
+		}
+
+		public void SetReadiness(string id)
+		{
+			if (PlayerAId == id)
+			{
+				PlayerAReadiness = true;
+			}
+			else
+			{
+				PlayerBReadiness = true;
+			}
+		}
+
+		public bool ArePlayersReady()
+		{
+			return PlayerAReadiness & PlayerBReadiness;
+		}
+
+		public void ResetReadiness()
+		{
+			PlayerAReadiness = false;
+			PlayerBReadiness = false;
 		}
 	}
 }

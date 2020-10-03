@@ -148,7 +148,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 	}
 
 	private pushToHomePage() {
-		this.hub.stop().finally(() => this.props.history.push("/"));
+		this.props.history.push("/");
 	}
 
 	render() {

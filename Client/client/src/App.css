@@ -16,32 +16,31 @@ body,
 }
 
 body {
-	background-color: #81b214;
+	background-color: #206a5d;
 }
 
 .btn {
-	border: none;
     font-family: inherit;
-    font-size: 15pt;
     font-weight: normal;
     cursor: pointer;
-    padding: 20px 40px;
+    padding: 20px;
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 1px;
     outline: none;
     position: relative;
-	background: #cb4e4e;
-    color: #fff;
-    box-shadow: 0 6px #ab3c3c;
 	border-radius: 40px;
-    -webkit-transition: none;
-    -moz-transition: none;
-	transition: none;
+	-webkit-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+	border: none;
+	background-color: white;
+	color: black;
+	font-size: 12pt;
 }
-.btn:active {
-	box-shadow: 0 0 #ab3c3c;
-	top: 6px;
+
+.btn:hover {
+	background-color: #bfdcae;
+    color: black;
 }
 
 .textbox {

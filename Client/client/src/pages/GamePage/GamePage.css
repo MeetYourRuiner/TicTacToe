@@ -9,10 +9,10 @@
 }
 
 .game-page {
-	background: #cb4e4e;
     padding: 24px;
-	box-shadow: 0 6px #ab3c3c;
-	border-radius: 3%;
+	background: #81b214;
+	box-shadow: 0 6px #53730d;
+	border-radius: 19px;
 	display: flex;
 	flex-direction: column;
 	position: relative;
@@ -21,14 +21,10 @@
 .game-page .leave-room {
 	align-self: flex-start;
 	padding: 5px 20px;
-	background-color: inherit;
 	position: absolute;
-	left: -61px;
+	left: 0;
 	top: 0;
-}
-
-.game-page .leave-room:active {
-    top: 6px;
+	z-index: 3;
 }
 
 .game-page .ready {
@@ -39,6 +35,10 @@
 	z-index: 2;
 }
 
+.game-page .ready:disabled {
+	z-index: 0;
+}
+
 .game-page .blackout {
 	top: 0;
 	right: 0;
@@ -47,7 +47,11 @@
 	height: 100%;
 	position: absolute;
 	box-shadow: 0 6px black;
-	border-radius: 3%;
+	border-radius: inherit;
 	background-color: black;
 	opacity: 30%;
+}
+
+.game-page .error-dialog {
+	width: 314px;
 }

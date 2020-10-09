@@ -9,7 +9,6 @@
 	width: inherit;
 	z-index: 5;
 	left: 0;
-	bottom: 50%;
 }
 
 .error-dialog * {
@@ -36,5 +35,6 @@
 .error-description {
 	color: white;
     font-size: 12pt;
-    margin-bottom: 12px;
+	margin-bottom: 12px;
+	text-align: center;
 }

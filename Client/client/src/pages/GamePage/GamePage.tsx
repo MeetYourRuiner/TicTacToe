@@ -7,6 +7,7 @@ import * as signalR from "@microsoft/signalr";
 import { ErrorCodes } from "../../enums/ErrorCodes";
 
 import "./GamePage.css";
+import ErrorDialog from "../../components/ErrorDialog/ErrorDialog";
 
 interface IGamepageState {
 	code: string;
@@ -18,6 +19,7 @@ interface IGamepageState {
 	myRole: string;
 	isWaitingForReadiness: boolean;
 	isReadyPressed: boolean;
+	error: ErrorCodes | undefined;
 }
 
 interface IPathProps {}
@@ -33,7 +35,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 		super(props);
 		this.state = {
 			code: "",
-			status: "",
+			status: "Connecting...",
 			myId: "",
 			myRole: "",
 			board: new Array<string>().fill(" "),
@@ -41,6 +43,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			isGameStopped: true,
 			isWaitingForReadiness: false,
 			isReadyPressed: false,
+			error: undefined,
 		};
 	}
 	componentDidMount() {
@@ -102,7 +105,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 		});
 
 		this.hub.on("error", (errorCode: ErrorCodes) => {
-			this.pushToHomePage();
+			this.setState({error: errorCode});
 		});
 
 		this.hub.on("readyCheck", () => {
@@ -110,6 +113,16 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 				isWaitingForReadiness: true,
 				isReadyPressed: false,
 			});
+		});
+
+		this.hub.onclose((error) => {
+			if (error) {
+				if (
+					error instanceof signalR.TimeoutError ||
+					error instanceof signalR.AbortError
+				)
+				this.setState({error: ErrorCodes.ConnectionLost});
+			}
 		});
 
 		this.hub
@@ -120,7 +133,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 				this.setState({ code: code });
 				this.connect(code);
 			})
-			.catch((err) => console.log(err));
+			.catch(() => this.setState({error: ErrorCodes.ConnectionFailed}));
 	}
 
 	componentWillUnmount() {
@@ -147,7 +160,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 		this.pushToHomePage();
 	}
 
-	private pushToHomePage() {
+	private pushToHomePage(errorCode: ErrorCodes | undefined = undefined) {
 		this.props.history.push("/");
 	}
 
@@ -158,6 +171,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 					className="btn leave-room"
 					onClick={() => this.handleClickLeaveRoom()}
 				>
+					{/* 🡠 */}
 					&#129120;
 				</button>
 				<Status value={this.state.status} />
@@ -178,6 +192,15 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 				{(this.state.isGameStopped ||
 					this.state.isWaitingForReadiness) && (
 					<div className="blackout" />
+				)}
+				{this.state.error && (
+					<ErrorDialog
+						errorCode={this.state.error}
+						handleClickFunction={() => {
+							this.setState({ error: undefined });
+							this.pushToHomePage();
+						}}
+					/>
 				)}
 			</div>
 		);

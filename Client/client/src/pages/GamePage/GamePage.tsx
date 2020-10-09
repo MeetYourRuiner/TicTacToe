@@ -55,7 +55,7 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			if (this.state.myId === playerId) {
 				this.setState({ isMyTurn: true, status: "Your turn" });
 			} else {
-				this.setState({ isMyTurn: true, status: "Opponent's turn" });
+				this.setState({ isMyTurn: false, status: "Opponent's turn" });
 			}
 		});
 

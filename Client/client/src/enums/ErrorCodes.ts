@@ -6,4 +6,5 @@ export enum ErrorCodes {
 	ConnectionFailed,
 	ConnectionLost,
 	ServerIsUnavailable,
+	IncorrectCodeFormat,
 }

@@ -47,6 +47,10 @@ class APIService {
 						// RoomNotFound,
 						throw new RoomError(ErrorCodes.RoomNotFound);
 					}
+					case 7: {
+						// IncorrectCodeFormat
+						throw new RoomError(ErrorCodes.IncorrectCodeFormat);
+					}
 				}
 			}
 			throw new RoomError(ErrorCodes.ServerError);

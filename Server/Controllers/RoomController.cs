@@ -35,6 +35,8 @@ namespace TicTacToe.Controllers
 		{
 			try
 			{
+				if (code == null || code.Length != 5)
+					throw new RoomException(ErrorCodes.IncorrectCodeFormat.ToString(), ErrorCodes.IncorrectCodeFormat);
 				code = code.ToUpper();
 				var room = _roomRepository.FindByCode(code);
 				if (!room.IsFull())
@@ -54,14 +56,15 @@ namespace TicTacToe.Controllers
 					{
 						return new NotFoundObjectResult(ErrorCodes.RoomNotFound);
 					}
+					case ErrorCodes.IncorrectCodeFormat:
+					{
+						return new NotFoundObjectResult(ErrorCodes.IncorrectCodeFormat);
+					}
 					default:
 					{
 						return new StatusCodeResult(500);
 					}
 				}
-			}
-			catch (System.NullReferenceException) {
-				return new BadRequestResult();
 			}
 		}
 	}

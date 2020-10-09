@@ -9,5 +9,6 @@ namespace TicTacToe
 		ConnectionFailed,
 		ConnectionLost,
 		ServerIsUnavailable,
+		IncorrectCodeFormat,
 	}
 }

@@ -28,6 +28,8 @@ function ErrorDialog(props: IErrorDialogProps) {
 				return "Connection to the websocket is lost";
 			case ErrorCodes.ServerIsUnavailable:
 				return "Server is unavailable";
+			case ErrorCodes.IncorrectCodeFormat:
+				return "Code must be a 5-char sequence";
 			default:
 				return "";
 		}

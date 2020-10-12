@@ -182,6 +182,8 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 				<Gameboard
 					value={this.state.board}
 					onCellClick={(index: number) => this.handleClick(index)}
+					myRole={this.state.myRole}
+					isMyTurn={this.state.isMyTurn}
 				/>
 				<CodeLabel value={this.state.code} />
 				{this.state.isWaitingForReadiness && (

@@ -90,6 +90,7 @@ namespace TicTacToe.Hubs
 				var room = _roomRepository.FindByPlayerID(Context.ConnectionId);
 				room.RemovePlayer(Context.ConnectionId);
 				await this.Clients.Group(room.Code).Stop();
+				await this.Clients.Group(room.Code).OpponentDisconnected();
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Code);
 				if (room.IsEmpty())
 				{

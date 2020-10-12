@@ -14,5 +14,6 @@ namespace TicTacToe.Hubs
 		Task Error(ErrorCodes errorCode);
 		Task Connected();
 		Task ReadyCheck();
+		Task OpponentDisconnected();
 	}
 }

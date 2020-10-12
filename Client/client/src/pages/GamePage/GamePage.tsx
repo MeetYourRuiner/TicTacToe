@@ -97,6 +97,10 @@ class GamePage extends React.Component<IOwnProps, IGamepageState> {
 			this.setState({ status: "Waiting for opponent" });
 		});
 
+		this.hub.on("opponentDisconnected", () => {
+			this.setState({ status: "Waiting for opponent" });
+		});
+
 		this.hub.on("stop", async () => {
 			this.setState({
 				isGameStopped: true,

@@ -4,6 +4,7 @@
 	border: 3px #bfdcae dashed;
 	cursor: pointer;
 	padding: 2%;
+	min-height: 32px;
 }
 
 .code-label-text {
@@ -13,4 +14,9 @@
     color: #fff;
 	text-align: center;
 	font-family: monospace;
+}
+
+.code-label-icon {
+	position: absolute;
+	height: 12px;
 }

@@ -17,7 +17,7 @@ function CodeLabel(props: ICodeLabelProps) {
 
 	return (
 		<div  onClick={() => handleClick()} className="code-label-wrapper">
-			<img className="code-label-icon" src={copyIcon}/>
+			<img alt="" className="code-label-icon" src={copyIcon}/>
 			<div className="code-label-text">{props.value}</div>
 		</div>
 	);

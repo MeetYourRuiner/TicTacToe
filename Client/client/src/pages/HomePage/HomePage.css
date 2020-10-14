@@ -1,0 +1,44 @@
+.home-page {
+	background: #81b214;
+    padding: 24px;
+	box-shadow: 0 6px #53730d;
+	border-radius: 19px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	width: 362px;
+}
+
+.btn.create-room {
+	width: 100%;
+	margin-bottom: 24px;
+}
+
+.btn.enter-room {
+	width: 55%;
+}
+
+.textbox.code {
+	text-transform: uppercase;
+	margin-right: 5%;
+	width: 40%;
+    text-align: center;
+    padding: 10px;
+	vertical-align: bottom;
+	font-family: monospace;
+	align-self: center;
+	letter-spacing: 5pt;
+	font-size: 12pt;
+}
+
+.code-wrapper {
+	display: flex;
+}
+
+.title {
+	color: white;
+    text-align: center;
+    font-size: 20pt;
+    font-weight: 800;
+    margin-bottom: 24px;
+}

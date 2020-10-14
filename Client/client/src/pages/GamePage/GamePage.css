@@ -1,0 +1,57 @@
+.game-page > .status-wrapper {
+	margin-bottom: 10px;
+	z-index: 2;
+}
+
+.game-page > .code-label-wrapper {
+	margin-top: 10px;
+	z-index: 2;
+}
+
+.game-page {
+    padding: 24px;
+	background: #81b214;
+	box-shadow: 0 6px #53730d;
+	border-radius: 19px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.game-page .leave-room {
+	align-self: flex-start;
+	padding: 5px 20px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 3;
+}
+
+.game-page .ready {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+}
+
+.game-page .ready:disabled {
+	z-index: 0;
+}
+
+.game-page .blackout {
+	top: 0;
+	right: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	box-shadow: 0 6px black;
+	border-radius: inherit;
+	background-color: black;
+	opacity: 30%;
+}
+
+.game-page .error-dialog {
+	width: 314px;
+}

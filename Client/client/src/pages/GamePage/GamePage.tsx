@@ -29,7 +29,6 @@ interface IOwnProps extends RouteComponentProps<IPathProps> {}
 class GamePage extends React.Component<IOwnProps, IGamepageState> {
 	hub: signalR.HubConnection = new signalR.HubConnectionBuilder()
 		.withUrl("http://192.168.0.106:5000/game")
-		.configureLogging(signalR.LogLevel.Trace)
 		.build();
 	constructor(props: any) {
 		super(props);

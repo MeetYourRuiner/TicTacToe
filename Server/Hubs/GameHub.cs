@@ -94,7 +94,7 @@ namespace TicTacToe.Hubs
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Code);
 				if (room.IsEmpty())
 				{
-					_roomRepository.Rooms.Remove(room);
+					_roomRepository.StartRemovalTimer(room);
 				}
 			}
 			catch { }

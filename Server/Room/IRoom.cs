@@ -1,3 +1,4 @@
+using System;
 using TicTacToe.GameLogic;
 
 namespace TicTacToe.RoomNS
@@ -18,5 +19,7 @@ namespace TicTacToe.RoomNS
 		bool IsEmpty();
 		bool ArePlayersReady();
 		void ResetReadiness();
+		void StartTimer(Action DeleteRoomAction);
+		void GenerateOtherCode();
 	}
 }

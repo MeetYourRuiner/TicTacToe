@@ -11,6 +11,7 @@ namespace TicTacToe
 		Room Create();
 		Room FindByPlayerID(string id);
 		Room FindByCode(string code);
+		void StartRemovalTimer(Room room);
 	}
 
 	public class RoomRepository : IRoomRepository
@@ -20,8 +21,27 @@ namespace TicTacToe
 		public Room Create()
 		{
 			var room = new Room();
-			Rooms.Add(room);
+			bool isOk = false;
+			while (!isOk)
+			{
+				try
+				{
+					FindByCode(room.Code);
+				}
+				catch
+				{
+					isOk = true;
+					Rooms.Add(room);
+					StartRemovalTimer(room);
+				}
+				room.GenerateOtherCode();
+			}
 			return room;
+		}
+
+		public void StartRemovalTimer(Room room)
+		{
+			room.StartTimer(() => Rooms.Remove(room));
 		}
 
 		public Room FindByPlayerID(string id)

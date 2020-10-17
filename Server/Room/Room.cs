@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using TicTacToe.GameLogic;
 using TicTacToe.CustomExceptions;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace TicTacToe.RoomNS
 {
@@ -13,6 +15,9 @@ namespace TicTacToe.RoomNS
 		public string PlayerBId { get; set; }
 		public bool PlayerAReadiness { get; set; }
 		public bool PlayerBReadiness { get; set; }
+
+		private CancellationTokenSource _cancellationTokenSource = null;
+
 
 		public Room()
 		{
@@ -32,10 +37,12 @@ namespace TicTacToe.RoomNS
 			if (PlayerAId == string.Empty)
 			{
 				PlayerAId = id;
+				StopTimer();
 			}
 			else if (PlayerBId == string.Empty)
 			{
 				PlayerBId = id;
+				StopTimer();
 			}
 			else
 			{
@@ -106,6 +113,30 @@ namespace TicTacToe.RoomNS
 		{
 			PlayerAReadiness = false;
 			PlayerBReadiness = false;
+		}
+
+		async public void StartTimer(Action DeleteRoomAction)
+		{
+			try
+			{
+				_cancellationTokenSource = new CancellationTokenSource();
+				await Task.Delay(TimeSpan.FromMinutes(3), _cancellationTokenSource.Token);
+				DeleteRoomAction();
+			}
+			catch (TaskCanceledException)
+			{
+				return;
+			}
+		}
+
+		private void StopTimer()
+		{
+			_cancellationTokenSource?.Cancel();
+		}
+
+		public void GenerateOtherCode()
+		{
+			Code = GenerateCode(5);
 		}
 	}
 }

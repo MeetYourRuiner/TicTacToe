@@ -17,7 +17,7 @@ namespace TicTacToe
 				builder
 					.AllowAnyMethod()
 					.AllowAnyHeader()
-					.WithOrigins("http://localhost:3000", "http://192.168.0.106:3000")
+					.WithOrigins("https://stotch-tictactoe.netlify.app")
 					.AllowCredentials();
 			}));
 			services.AddSingleton<IRoomRepository>(new RoomRepository());

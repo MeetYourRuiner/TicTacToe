@@ -2,7 +2,7 @@ import { ErrorCodes } from "../enums/ErrorCodes";
 import { HttpStatusCodes } from "../enums/HttpStatusCodes";
 import RoomError from "../errors/RoomError";
 
-const API_ENDPOINT: string = "http://192.168.0.106:5000/api";
+const API_ENDPOINT: string = "https://stotch-tictactoe.azurewebsites.net/api";
 
 class APIService {
 	public static CreateRoom = async () => {

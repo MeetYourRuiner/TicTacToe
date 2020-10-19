@@ -12,6 +12,7 @@ node_modules
 /build
 Client/client/build
 /Server/publish
+.netlify/
 
 # misc
 .DS_Store

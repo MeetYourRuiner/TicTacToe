@@ -39,15 +39,15 @@ class APIService {
 			if (response.status === HttpStatusCodes.NOT_FOUND) {
 				let errorCode: number = await response.json();
 				switch (errorCode) {
-					case 0: {
+					case 1: {
 						// RoomIsFull
 						throw new RoomError(ErrorCodes.RoomIsFull);
 					}
-					case 1: {
+					case 2: {
 						// RoomNotFound,
 						throw new RoomError(ErrorCodes.RoomNotFound);
 					}
-					case 7: {
+					case 8: {
 						// IncorrectCodeFormat
 						throw new RoomError(ErrorCodes.IncorrectCodeFormat);
 					}
